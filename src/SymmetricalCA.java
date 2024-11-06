@@ -4,9 +4,9 @@ import java.util.Random;
  * Class consisting of simple algorithm for generating four-fold symmetrical grids.
  */
 public class SymmetricalCA {
-    private int width, height;
-    private int[][] grid;
-    private int states;
+    protected int width, height;
+    protected int[][] grid;
+    protected int states;
 
     public SymmetricalCA(int width, int height, int states) {
         if (width % 2 == 0 || height % 2 == 0) {
@@ -18,7 +18,7 @@ public class SymmetricalCA {
         this.grid = new int[height][width];
     }
 
-    public int[][] generateSymmetricalPattern(int iterations) {
+    protected int[][] generateSymmetricalPattern(int iterations) {
         Random random = new Random();
 
         for (int y = 0; y < height / 2; y++) {
@@ -33,10 +33,11 @@ public class SymmetricalCA {
         for (int i = 0; i < iterations; i++) {
             grid = applyCARules();
         }
+        grid = new int[][]{{1, 1, 0, 1, 1}, {0, 0, 0, 0, 0}, {1, 1, 0, 1, 1}, {0, 0, 0, 0, 0}, {1, 1, 0, 1, 1}};
         return grid;
     }
 
-    private int[][] applyCARules() {
+    protected int[][] applyCARules() {
         int[][] newGrid = new int[height][width];
 
         for (int y = 0; y < height; y++) {
@@ -59,7 +60,7 @@ public class SymmetricalCA {
         return newGrid;
     }
 
-    private int getMooreNeighborhoodSum(int x, int y) {
+    protected int getMooreNeighborhoodSum(int x, int y) {
         int sum = 0;
         for (int dy = -1; dy <= 1; dy++) {
             for (int dx = -1; dx <= 1; dx++) {

@@ -12,15 +12,17 @@ class SDSAlgorithm {
     private int[][] grid;
     private int gridWidth, gridHeight;
     private int iterations;
+    private String diffusionType;
 
     /**
      * Constructor, includes Step 1 of the algorithm, where agents are initialized with random hypotheses
      */
-    public SDSAlgorithm(int[][] grid, int numAgents, int iterations) {
+    public SDSAlgorithm(int[][] grid, int numAgents, int iterations, String diffusionType) {
         this.grid = grid;
         this.gridWidth = grid.length;
         this.gridHeight = grid[0].length;
         this.iterations = iterations;
+        this.diffusionType = diffusionType;
         agents = new ArrayList<>();
 
         for (int i = 0; i < numAgents; i++) {
@@ -38,7 +40,11 @@ class SDSAlgorithm {
             for (SDSAgent agent : agents) {
                 testHypothesis(agent, grid, gridWidth, gridHeight);
             }
-            diffusionPhase(agents);
+            if ("Context-Sensitive".equals(diffusionType)) {
+                diffusionPhaseContext(agents);
+            } else {
+                diffusionPhasePassive(agents);
+            }
         }
     }
 
@@ -70,9 +76,39 @@ class SDSAlgorithm {
     /**
      *  Step 3 of the algorithm, propagating the hypothesis to other agents
      */
-    private void diffusionPhase(List<SDSAgent> agents) {
+    private void diffusionPhasePassive(List<SDSAgent> agents) {
         for (SDSAgent agent : agents) {
             if (!agent.isActive()) {
+                SDSAgent randomAgent = agents.get(new Random().nextInt(agents.size()));
+                if (randomAgent.isActive()) {
+                    agent.setHypothesis(randomAgent.getX(), randomAgent.getY());
+                } else {
+                    agent.setHypothesis(new Random().nextInt(gridWidth), new Random().nextInt(gridHeight));
+                }
+            }
+        }
+    }
+
+    /**
+     * Context-sensitive diffusion phase where active agents may reset to explore new hypotheses.
+     */
+    private void diffusionPhaseContext(List<SDSAgent> agents) {
+        for (SDSAgent agent : agents) {
+            if (agent.isActive()) {
+                // Select a random agent to compare hypotheses
+                SDSAgent randomAgent = agents.get(new Random().nextInt(agents.size()));
+
+                // If both agents are active and share the same hypothesis, release the current agent
+                if (randomAgent.isActive() &&
+                        randomAgent.getX() == agent.getX() &&
+                        randomAgent.getY() == agent.getY()) {
+
+                    // Reset the current agent to explore a new hypothesis
+                    agent.setActive(false);
+                    agent.setHypothesis(new Random().nextInt(gridWidth), new Random().nextInt(gridHeight));
+                }
+            } else {
+                // Standard recruitment if the agent is inactive
                 SDSAgent randomAgent = agents.get(new Random().nextInt(agents.size()));
                 if (randomAgent.isActive()) {
                     agent.setHypothesis(randomAgent.getX(), randomAgent.getY());

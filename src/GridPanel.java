@@ -41,7 +41,8 @@ class GridPanel extends JPanel {
 
         // Draw agents
         for (SDSAgent agent : agents) {
-            g2d.setColor(agent.isActive() ? Color.GREEN : Color.BLUE);
+            Color color = agent.isActive() ? new Color(0, 255, 0, 100) : new Color(0, 0, 255, 100);
+            g2d.setColor(color);
 
             Ellipse2D oval = new Ellipse2D.Double(agent.getX() * cellSize, agent.getY() * cellSize, cellSize, cellSize);
             g2d.fill(oval);

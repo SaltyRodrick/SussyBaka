@@ -10,13 +10,15 @@ import java.awt.event.ActionListener;
 public class ConfigMenu extends JFrame {
     private JTextField gridSizeField;
     private JTextField sdsIterationsField;
+    private JComboBox<String> diffusionTypeCombo;
+    private JComboBox<String> caGeneratorCombo;
 
     public ConfigMenu() {
         setTitle("SDS Simulation Configuration");
-        setSize(300, 200);
+        setSize(300, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(3, 2));
+        setLayout(new GridLayout(5, 2));
 
         JLabel gridSizeLabel = new JLabel("Grid Size:");
         gridSizeField = new JTextField();
@@ -28,8 +30,18 @@ public class ConfigMenu extends JFrame {
         add(sdsIterationsLabel);
         add(sdsIterationsField);
 
+        JLabel diffusionTypeLabel = new JLabel("Diffusion Type:");
+        diffusionTypeCombo = new JComboBox<>(new String[]{"Passive", "Context-Sensitive"});
+        add(diffusionTypeLabel);
+        add(diffusionTypeCombo);
+
+        JLabel caGeneratorLabel = new JLabel("CA Generator Type:");
+        caGeneratorCombo = new JComboBox<>(new String[]{"Base", "Local Symmetry"});
+        add(caGeneratorLabel);
+        add(caGeneratorCombo);
+
         JButton runButton = new JButton("Start Simulation");
-        add(new JLabel());
+        add(new JLabel()); // Empty cell for alignment
         add(runButton);
 
         runButton.addActionListener(new ActionListener() {
@@ -43,7 +55,7 @@ public class ConfigMenu extends JFrame {
     }
 
     /**
-     * Checks for invalid inputs (even 'gridSize', non-numeric values). If successful, starts the simulation.
+     * Checks for invalid inputs and, if successful, starts the simulation.
      */
     private void startSimulation() {
         try {
@@ -56,12 +68,15 @@ public class ConfigMenu extends JFrame {
             }
 
             if (gridSize % 2 == 0) {
-                JOptionPane.showMessageDialog(this, "Grid Size must be an even number.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Grid Size must be an odd number.", "Input Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
+            String diffusionType = (String) diffusionTypeCombo.getSelectedItem();
+            String caGeneratorType = (String) caGeneratorCombo.getSelectedItem();
+
             SwingUtilities.invokeLater(() -> {
-                SDSSimulation.startSimulation(gridSize, sdsIterations);
+                SDSSimulation.startSimulation(gridSize, sdsIterations, diffusionType, caGeneratorType);
             });
             dispose();
         } catch (NumberFormatException e) {
