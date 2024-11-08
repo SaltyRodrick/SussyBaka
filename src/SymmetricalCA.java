@@ -33,7 +33,7 @@ public class SymmetricalCA {
         for (int i = 0; i < iterations; i++) {
             grid = applyCARules();
         }
-        grid = new int[][]{{1, 1, 0, 1, 1}, {0, 0, 0, 0, 0}, {1, 1, 0, 1, 1}, {0, 0, 0, 0, 0}, {1, 1, 0, 1, 1}};
+        //grid = new int[][]{{1, 1, 0, 1, 1}, {0, 0, 0, 0, 0}, {1, 1, 0, 1, 1}, {0, 0, 0, 0, 0}, {1, 1, 0, 1, 1}};
         return grid;
     }
 

@@ -13,6 +13,7 @@ class SDSAlgorithm {
     private int gridWidth, gridHeight;
     private int iterations;
     private String diffusionType;
+    private int[] activeAgentCounts;
 
     /**
      * Constructor, includes Step 1 of the algorithm, where agents are initialized with random hypotheses
@@ -25,11 +26,14 @@ class SDSAlgorithm {
         this.diffusionType = diffusionType;
         agents = new ArrayList<>();
 
+        // Initialize agents
         for (int i = 0; i < numAgents; i++) {
             int x = new Random().nextInt(gridWidth);
             int y = new Random().nextInt(gridHeight);
             agents.add(new SDSAgent(x, y));
         }
+
+        activeAgentCounts = new int[iterations];
     }
 
     /**
@@ -40,20 +44,40 @@ class SDSAlgorithm {
             for (SDSAgent agent : agents) {
                 testHypothesis(agent, grid, gridWidth, gridHeight);
             }
+
             if ("Context-Sensitive".equals(diffusionType)) {
                 diffusionPhaseContext(agents);
             } else {
                 diffusionPhasePassive(agents);
             }
+
+            activeAgentCounts[i] = countActiveAgents();
         }
+    }
+
+    /**
+     * Count how many agents are active
+     */
+    private int countActiveAgents() {
+        int activeCount = 0;
+        for (SDSAgent agent : agents) {
+            if (agent.isActive()) {
+                activeCount++;
+            }
+        }
+        return activeCount;
     }
 
     public List<SDSAgent> getAgents() {
         return agents;
     }
 
+    public int[] getActiveAgentCounts() {
+        return activeAgentCounts;
+    }
+
     /**
-     *  Step 2 of the algorithm, testing the hypothesis that the currently chosen cell is center of symmetry
+     * Step 2 of the algorithm, testing the hypothesis that the currently chosen cell is center of symmetry
      */
     private void testHypothesis(SDSAgent agent, int[][] grid, int width, int height) {
         int x = agent.getX();
@@ -74,7 +98,7 @@ class SDSAlgorithm {
     }
 
     /**
-     *  Step 3 of the algorithm, propagating the hypothesis to other agents
+     * Step 3 of the algorithm, propagating the hypothesis to other agents
      */
     private void diffusionPhasePassive(List<SDSAgent> agents) {
         for (SDSAgent agent : agents) {
@@ -95,20 +119,16 @@ class SDSAlgorithm {
     private void diffusionPhaseContext(List<SDSAgent> agents) {
         for (SDSAgent agent : agents) {
             if (agent.isActive()) {
-                // Select a random agent to compare hypotheses
                 SDSAgent randomAgent = agents.get(new Random().nextInt(agents.size()));
 
-                // If both agents are active and share the same hypothesis, release the current agent
                 if (randomAgent.isActive() &&
                         randomAgent.getX() == agent.getX() &&
                         randomAgent.getY() == agent.getY()) {
 
-                    // Reset the current agent to explore a new hypothesis
                     agent.setActive(false);
                     agent.setHypothesis(new Random().nextInt(gridWidth), new Random().nextInt(gridHeight));
                 }
             } else {
-                // Standard recruitment if the agent is inactive
                 SDSAgent randomAgent = agents.get(new Random().nextInt(agents.size()));
                 if (randomAgent.isActive()) {
                     agent.setHypothesis(randomAgent.getX(), randomAgent.getY());

@@ -11,7 +11,7 @@ public class ConfigMenu extends JFrame {
     private JTextField gridSizeField;
     private JTextField sdsIterationsField;
     private JComboBox<String> diffusionTypeCombo;
-    private JComboBox<String> caGeneratorCombo;
+    private JTextField gridMultiplier;
 
     public ConfigMenu() {
         setTitle("SDS Simulation Configuration");
@@ -35,10 +35,10 @@ public class ConfigMenu extends JFrame {
         add(diffusionTypeLabel);
         add(diffusionTypeCombo);
 
-        JLabel caGeneratorLabel = new JLabel("CA Generator Type:");
-        caGeneratorCombo = new JComboBox<>(new String[]{"Base", "Local Symmetry"});
-        add(caGeneratorLabel);
-        add(caGeneratorCombo);
+        JLabel gridMultiplierLabel = new JLabel("Grid multiplier:");
+        gridMultiplier = new JTextField();
+        add(gridMultiplierLabel);
+        add(gridMultiplier);
 
         JButton runButton = new JButton("Start Simulation");
         add(new JLabel()); // Empty cell for alignment
@@ -61,6 +61,7 @@ public class ConfigMenu extends JFrame {
         try {
             int gridSize = Integer.parseInt(gridSizeField.getText());
             int sdsIterations = Integer.parseInt(sdsIterationsField.getText());
+            int gridMultiplierA = Integer.parseInt(gridMultiplier.getText());
 
             if (gridSize <= 0 || sdsIterations <= 0) {
                 JOptionPane.showMessageDialog(this, "Values must be greater than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -73,10 +74,9 @@ public class ConfigMenu extends JFrame {
             }
 
             String diffusionType = (String) diffusionTypeCombo.getSelectedItem();
-            String caGeneratorType = (String) caGeneratorCombo.getSelectedItem();
 
             SwingUtilities.invokeLater(() -> {
-                SDSSimulation.startSimulation(gridSize, sdsIterations, diffusionType, caGeneratorType);
+                SDSSimulation.startSimulation(gridSize, sdsIterations, diffusionType, gridMultiplierA);
             });
             dispose();
         } catch (NumberFormatException e) {
